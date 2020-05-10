@@ -39,6 +39,10 @@ ambient_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, 
     }
 
     deviceID = b[1];
+    if (deviceID != 212)
+    	{
+	    return 0;
+	}
     isBatteryLow = (b[2] & 0x80) != 0; // if not zero, battery is low
     channel = ((b[2] & 0x70) >> 4) + 1;
     int temp_f = ((b[2] & 0x0f) << 8) | b[3];
@@ -46,7 +50,7 @@ ambient_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, 
     humidity = b[4];
 
     data = data_make(
-            "model",          "",             DATA_STRING, _X("Ambientweather-F007TH","Ambient Weather F007TH Thermo-Hygrometer"),
+            "model",          "",             DATA_STRING, _X("Ambientweather-F007TH","SwitchDoc Labs F007TH Thermo-Hygrometer"),
             _X("id","device"),         "House Code",   DATA_INT,    deviceID,
             "channel",        "Channel",      DATA_INT,    channel,
             "battery",        "Battery",      DATA_STRING, isBatteryLow ? "Low" : "OK",

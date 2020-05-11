@@ -151,6 +151,7 @@ rtl_433_SOURCES      = abuf.c \
                        devices/wt450.c \
                        devices/x10_rf.c \
                        devices/x10_sec.c \
-                       devices/switchdoclabs_FT0300.c
+                       devices/switchdoclabs_FT0300.c \
+                       devices/switchdoclabs_F007TH.c
 
 rtl_433_LDADD        = $(LIBRTLSDR) $(LIBM)

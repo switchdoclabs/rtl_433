@@ -154,6 +154,7 @@
     DECL(archos_tbh) \
     DECL(ws2032) \
     DECL(switchdoclabs_FT0300) \
+    DECL(switchdoclabs_F007TH) \
 
     /* Add new decoders here. */
 

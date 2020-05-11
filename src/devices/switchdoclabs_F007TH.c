@@ -1,4 +1,5 @@
-/* Ambient Weather F007TH Thermo-Hygrometer
+/* SwitchDoc Labs F007TH Thermo-Hygrometer
+ * Modified by John Shovic
  * contributed by David Ediger
  * discovered by Ron C. Lewis
  *
@@ -13,7 +14,8 @@
 static const uint8_t preamble_pattern[2] = {0x01, 0x45}; // 12 bits
 static const uint8_t preamble_inverted[2] = {0xfd, 0x45}; // 12 bits
 
-static int ambient_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned bitpos)
+static int
+switchdoclabs_F007TH_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned bitpos)
 {
     uint8_t b[6];
     int deviceID;
@@ -26,18 +28,33 @@ static int ambient_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, uns
     bitbuffer_extract_bytes(bitbuffer, row, bitpos, b, 6*8);
 
     uint8_t expected = b[5];
+   
     uint8_t calculated = lfsr_digest8(b, 5, 0x98, 0x3e) ^ 0x64;
+    int i;
+    for (i=0; i< 5; i++)
+    {
+	    fprintf(stderr,"b(%d) =0x%02x %d\n",i, b[i], b[i]);
+    } 
 
+    //	expected = calculated; // disable CRC
+    //
     if (expected != calculated) {
         if (decoder->verbose) {
-            fprintf(stderr, "Checksum error in Ambient Weather message.    Expected: %02x    Calculated: %02x\n", expected, calculated);
+            fprintf(stderr, "Checksum error in SwitchDoc Labs F007TH message.    Expected: %02x    Calculated: %02x\n", expected, calculated);
             fprintf(stderr, "Message: ");
             bitrow_print(b, 48);
         }
-        return DECODE_FAIL_MIC;
+        return 0;
     }
 
     deviceID = b[1];
+    fprintf(stderr, "deviceid = 0x%02x %d\n", deviceID, deviceID);
+    /*
+    if (deviceID != 212)
+    	{
+	    return 0;
+	}
+    */
     isBatteryLow = (b[2] & 0x80) != 0; // if not zero, battery is low
     channel = ((b[2] & 0x70) >> 4) + 1;
     int temp_f = ((b[2] & 0x0f) << 8) | b[3];
@@ -45,7 +62,7 @@ static int ambient_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, uns
     humidity = b[4];
 
     data = data_make(
-            "model",          "",             DATA_STRING, _X("Ambientweather-F007TH","Ambient Weather F007TH Thermo-Hygrometer"),
+            "model",          "",             DATA_STRING, _X("SwitchDocLabs-F007TH","SwitchDoc Labs F007TH Thermo-Hygrometer"),
             _X("id","device"),         "House Code",   DATA_INT,    deviceID,
             "channel",        "Channel",      DATA_INT,    channel,
             "battery",        "Battery",      DATA_STRING, isBatteryLow ? "Low" : "OK",
@@ -58,11 +75,12 @@ static int ambient_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, uns
     return 1;
 }
 
-static int ambient_weather_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int
+switchdoclabs_F007TH_callback(r_device *decoder, bitbuffer_t *bitbuffer)
 {
     int row;
     unsigned bitpos;
-    int ret = 0;
+    int events = 0;
 
     for (row = 0; row < bitbuffer->num_rows; ++row) {
         bitpos = 0;
@@ -70,21 +88,21 @@ static int ambient_weather_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         while ((bitpos = bitbuffer_search(bitbuffer, row, bitpos,
                 (const uint8_t *)&preamble_pattern, 12)) + 8+6*8 <=
                 bitbuffer->bits_per_row[row]) {
-            ret = ambient_weather_decode(decoder, bitbuffer, row, bitpos + 8);
-            if (ret > 0) return ret; // for now, break after first successful message
+            events += switchdoclabs_F007TH_decode(decoder, bitbuffer, row, bitpos + 8);
+            if (events) return events; // for now, break after first successful message
             bitpos += 16;
         }
         bitpos = 0;
         while ((bitpos = bitbuffer_search(bitbuffer, row, bitpos,
                 (const uint8_t *)&preamble_inverted, 12)) + 8+6*8 <=
                 bitbuffer->bits_per_row[row]) {
-            ret = ambient_weather_decode(decoder, bitbuffer, row, bitpos + 8);
-            if (ret > 0) return ret; // for now, break after first successful message
+            events += switchdoclabs_F007TH_decode(decoder, bitbuffer, row, bitpos + 8);
+            if (events) return events; // for now, break after first successful message
             bitpos += 15;
         }
     }
 
-    return ret;
+    return events;
 }
 
 static char *output_fields[] = {
@@ -99,13 +117,13 @@ static char *output_fields[] = {
     NULL
 };
 
-r_device ambient_weather = {
-    .name          = "Ambient Weather Temperature Sensor",
+r_device switchdoclabs_F007TH = {
+    .name          = "SwitchDoc Labs F007TH Temperature Humidity Sensor",
     .modulation    = OOK_PULSE_MANCHESTER_ZEROBIT,
     .short_width   = 500,
     .long_width    = 0, // not used
     .reset_limit   = 2400,
-    .decode_fn     = &ambient_weather_callback,
+    .decode_fn     = &switchdoclabs_F007TH_callback,
     .disabled      = 0,
     .fields        = output_fields
 };

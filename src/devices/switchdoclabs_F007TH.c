@@ -49,12 +49,11 @@ switchdoclabs_F007TH_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned 
 
     deviceID = b[1];
     fprintf(stderr, "deviceid = 0x%02x %d\n", deviceID, deviceID);
-    /*
-    if (deviceID != 212)
+    
+    if (deviceID != 233)
     	{
 	    return 0;
 	}
-    */
     isBatteryLow = (b[2] & 0x80) != 0; // if not zero, battery is low
     channel = ((b[2] & 0x70) >> 4) + 1;
     int temp_f = ((b[2] & 0x0f) << 8) | b[3];

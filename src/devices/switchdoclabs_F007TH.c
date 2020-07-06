@@ -18,6 +18,7 @@ static int
 switchdoclabs_F007TH_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned bitpos)
 {
     uint8_t b[6];
+    int modelNumber;
     int deviceID;
     int isBatteryLow;
     int channel;
@@ -46,11 +47,13 @@ switchdoclabs_F007TH_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned 
         }
         return 0;
     }
-
+    
+    modelNumber = b[0] & 0x0F;
+    fprintf(stderr, "modelnumber = 0x%02x %d\n", modelNumber, modelNumber);
     deviceID = b[1];
     fprintf(stderr, "deviceid = 0x%02x %d\n", deviceID, deviceID);
     
-    if (deviceID != 233)
+    if (modelNumber != 5)
     	{
 	    return 0;
 	}
@@ -62,7 +65,9 @@ switchdoclabs_F007TH_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned 
 
     data = data_make(
             "model",          "",             DATA_STRING, _X("SwitchDocLabs-F007TH","SwitchDoc Labs F007TH Thermo-Hygrometer"),
-            _X("id","device"),         "House Code",   DATA_INT,    deviceID,
+            _X("id","device"),         
+            "House Code",   DATA_INT,    deviceID,
+            "modelnumber",        "Model Number",      DATA_INT,    modelNumber,
             "channel",        "Channel",      DATA_INT,    channel,
             "battery",        "Battery",      DATA_STRING, isBatteryLow ? "Low" : "OK",
             "temperature_F",  "Temperature",  DATA_FORMAT, "%.1f F", DATA_DOUBLE, temperature,

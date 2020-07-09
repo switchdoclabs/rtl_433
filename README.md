@@ -1,3 +1,19 @@
+# rtl_433 with support for SwitchDoc Labs Wireless WeatherRack2 and FT003H Inside T/H sensors
+
+# to compile on Raspberry Pi
+
+cd rtl_433/
+mkdir build
+cd build
+cmake ..
+make
+make install
+
+
+
+
+
+
 # rtl_433
 
 rtl_433 (despite the name) is a generic data receiver, mainly for the 433.92 MHz, 868 MHz (SRD), 315 MHz, and 915 MHz ISM bands.

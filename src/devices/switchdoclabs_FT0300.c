@@ -168,6 +168,7 @@ switchdoclabs_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned
 	//myUV = myUV + 10;
 	myCRC = ((b[13] & 0x0f) << 4) + ((b[14] & 0xf0)>>4);
 */
+    /*
   	fprintf(stderr,"myDevice = %02x %d\n", myDevice, myDevice );
   	fprintf(stderr,"mySerial = %02x %d\n", mySerial, mySerial );
   	fprintf(stderr,"myFlags = %01x %d\n", myFlags, myFlags );
@@ -183,7 +184,7 @@ switchdoclabs_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned
   	fprintf(stderr,"myCRC = %02x %d\n", myCRC, myCRC );
   	fprintf(stderr,"myCalculated = %02x %d\n", myCalculated, myCalculated );
 
-
+    */
 
 
 
@@ -220,7 +221,7 @@ switchdoclabs_weather_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         while ((bitpos = bitbuffer_search(bitbuffer, row, bitpos,
                 (const uint8_t *)&preamble_pattern, 12)) + 8+6*8 <=
                 bitbuffer->bits_per_row[row]) {
-		fprintf(stderr,"before decode1\n");
+		//fprintf(stderr,"before decode1\n");
             events += switchdoclabs_weather_decode(decoder, bitbuffer, row, bitpos + 8);
             if (events) return events; // for now, break after first successful message
             bitpos += 16;
@@ -229,7 +230,7 @@ switchdoclabs_weather_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         while ((bitpos = bitbuffer_search(bitbuffer, row, bitpos,
                 (const uint8_t *)&preamble_inverted, 12)) + 8+6*8 <=
                 bitbuffer->bits_per_row[row]) {
-	    fprintf(stderr,"before decode2\n");
+	    //fprintf(stderr,"before decode2\n");
             events += switchdoclabs_weather_decode(decoder, bitbuffer, row, bitpos + 8);
             if (events) return events; // for now, break after first successful message
             bitpos += 15;

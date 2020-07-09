@@ -32,10 +32,11 @@ switchdoclabs_F007TH_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned 
    
     uint8_t calculated = lfsr_digest8(b, 5, 0x98, 0x3e) ^ 0x64;
     int i;
-    for (i=0; i< 5; i++)
+    /* for (i=0; i< 5; i++)
     {
 	    fprintf(stderr,"b(%d) =0x%02x %d\n",i, b[i], b[i]);
     } 
+    */
 
     //	expected = calculated; // disable CRC
     //
@@ -49,9 +50,9 @@ switchdoclabs_F007TH_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned 
     }
     
     modelNumber = b[0] & 0x0F;
-    fprintf(stderr, "modelnumber = 0x%02x %d\n", modelNumber, modelNumber);
+    // fprintf(stderr, "modelnumber = 0x%02x %d\n", modelNumber, modelNumber);
     deviceID = b[1];
-    fprintf(stderr, "deviceid = 0x%02x %d\n", deviceID, deviceID);
+    // fprintf(stderr, "deviceid = 0x%02x %d\n", deviceID, deviceID);
     
     if (modelNumber != 5)
     	{

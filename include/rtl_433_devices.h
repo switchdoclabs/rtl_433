@@ -153,8 +153,8 @@
     DECL(holman_ws5029pwm) \
     DECL(archos_tbh) \
     DECL(ws2032) \
-    DECL(switchdoclabs_FT0300) \
-    DECL(switchdoclabs_F007TH) \
+    DECL(switchdoclabs_FT020T) \
+    DECL(switchdoclabs_F016TH) \
 
     /* Add new decoders here. */
 

@@ -1,4 +1,4 @@
-/* SwitchDoc Labs F007TH Thermo-Hygrometer
+/* SwitchDoc Labs F016TH Thermo-Hygrometer
  * Modified by John Shovic
  * contributed by David Ediger
  * discovered by Ron C. Lewis
@@ -42,7 +42,7 @@ switchdoclabs_F016TH_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned 
     //
     if (expected != calculated) {
         if (decoder->verbose) {
-            fprintf(stderr, "Checksum error in SwitchDoc Labs F007TH message.    Expected: %02x    Calculated: %02x\n", expected, calculated);
+            fprintf(stderr, "Checksum error in SwitchDoc Labs F016TH message.    Expected: %02x    Calculated: %02x\n", expected, calculated);
             fprintf(stderr, "Message: ");
             bitrow_print(b, 48);
         }
@@ -65,7 +65,7 @@ switchdoclabs_F016TH_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned 
     humidity = b[4];
 
     data = data_make(
-            "model",          "",             DATA_STRING, _X("SwitchDocLabs-F007TH","SwitchDoc Labs F007TH Thermo-Hygrometer"),
+            "model",          "",             DATA_STRING, _X("SwitchDocLabs-F016TH","SwitchDoc Labs F016TH Thermo-Hygrometer"),
             _X("id","device"),         
             "House Code",   DATA_INT,    deviceID,
             "modelnumber",        "Model Number",      DATA_INT,    modelNumber,

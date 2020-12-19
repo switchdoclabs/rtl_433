@@ -152,6 +152,8 @@ add_executable(rtl_433
     devices/x10_sec.c
     devices/switchdoclabs_FT020T.c
     devices/switchdoclabs_F016TH.c
+    devices/switchdoclabs_solarmax.c
+    devices/switchdoclabs_SM23.c
 )
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")

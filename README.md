@@ -1,4 +1,4 @@
-# rtl_433 with support for SwitchDoc Labs Wireless WeatherRack2 and FT003H Inside T/H sensors
+# rtl_433 with support for SwitchDoc Labs Wireless WeatherRack2 and FT003H Inside T/H sensors, SolarMAX and SM23 Soil Moisture Sensors
 
 # to compile on Raspberry Pi
 
@@ -237,6 +237,10 @@ Read the Test Data section at the bottom.
     [143]  Holman Industries iWeather WS5029 weather station (older PWM)
     [144]  TBH weather sensor
     [145]  WS2032 weather station
+    [146]  SwitchDoc Labs FT020T  weather station
+    [147]  SwitchDoc Labs F016TH  weather T/H
+    [148]  SwitchDoc Labs SolarMAX Solar Power Controller
+    
 
 * Disabled by default, use -R n or -G
 

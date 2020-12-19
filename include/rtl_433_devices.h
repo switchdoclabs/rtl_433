@@ -155,6 +155,8 @@
     DECL(ws2032) \
     DECL(switchdoclabs_FT020T) \
     DECL(switchdoclabs_F016TH) \
+    DECL(switchdoclabs_solarmax) \
+    DECL(switchdoclabs_SM23) \
 
     /* Add new decoders here. */
 

@@ -253,7 +253,7 @@ static int switchdoclabs_solarmax_ask_callback(r_device *decoder, bitbuffer_t *b
 
     // now build output
     data = data_make(
-            "model",        "",             DATA_STRING, _X("SwitchDoc Labs SolarMAX","SwitchDoc Labs SolarMAX "),
+            "model",        "",             DATA_STRING, _X("SwitchDoc Labs SolarMAX","SwitchDoc Labs SolarMAX"),
             "len",          "Data len",     DATA_INT, data_len,
 
             "sparebyte",        "Spare Byte",        DATA_INT, spareByte,

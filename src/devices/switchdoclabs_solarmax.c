@@ -160,6 +160,31 @@ long convertByteToLong(uint8_t buffer[], int index)
       return myData.word;
     }
 
+unsigned long convertByteToUnsignedLong(uint8_t buffer[], int index)
+{
+
+    
+    union Long {
+      struct{
+        uint8_t   byte1;
+        uint8_t   byte2;
+        uint8_t   byte3;
+        uint8_t   byte4;
+
+      };
+      unsigned long  word;
+    
+      };
+
+      union Long myData;
+
+      myData.byte1 = buffer[index];
+      myData.byte2 = buffer[index+1];
+      myData.byte3 = buffer[index+2];
+      myData.byte4 = buffer[index+3];
+      return myData.word;
+    }
+
 float convertByteToFloat(uint8_t buffer[], int index)
 {
 
@@ -208,7 +233,7 @@ static int switchdoclabs_solarmax_ask_callback(r_device *decoder, bitbuffer_t *b
     float LoadCurrent;
     float SolarPanelVoltage;
     float SolarPanelCurrent;
-    float AuxA;
+    unsigned long AuxA;
     float AuxB;
 
 
@@ -242,7 +267,7 @@ static int switchdoclabs_solarmax_ask_callback(r_device *decoder, bitbuffer_t *b
     LoadCurrent  = convertByteToFloat(switchdoclabs_solarmax_payload, 34);
     SolarPanelVoltage  = convertByteToFloat(switchdoclabs_solarmax_payload, 38);
     SolarPanelCurrent  = convertByteToFloat(switchdoclabs_solarmax_payload, 42);
-    AuxA  = convertByteToFloat(switchdoclabs_solarmax_payload, 46);
+    AuxA  = convertByteToUnsignedLong(switchdoclabs_solarmax_payload, 46);
 
 
     // Format data
@@ -253,7 +278,7 @@ static int switchdoclabs_solarmax_ask_callback(r_device *decoder, bitbuffer_t *b
 
     // now build output
     data = data_make(
-            "model",        "",             DATA_STRING, _X("SwitchDoc Labs SolarMAX","SwitchDoc Labs SolarMAX "),
+            "model",        "",             DATA_STRING, _X("SwitchDoc Labs SolarMAX","SwitchDoc Labs SolarMAX"),
             "len",          "Data len",     DATA_INT, data_len,
 
             "sparebyte",        "Spare Byte",        DATA_INT, spareByte,
@@ -270,7 +295,7 @@ static int switchdoclabs_solarmax_ask_callback(r_device *decoder, bitbuffer_t *b
             "loadcurrent",        "Load Current",        DATA_DOUBLE, LoadCurrent,
             "solarpanelvoltage",        "Solar Panel Voltage",        DATA_DOUBLE, SolarPanelVoltage,
             "solarpanelcurrent",        "Solar Panel Current",        DATA_DOUBLE, SolarPanelCurrent,
-            "auxa",        "Aux A",        DATA_DOUBLE, AuxA,
+            "auxa",        "Aux A",        DATA_INT, AuxA,
 
             "mic",          "Integrity",    DATA_STRING, "CRC",
             NULL);

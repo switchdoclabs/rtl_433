@@ -274,7 +274,6 @@ static int switchdoclabs_solarmax_ask_callback(r_device *decoder, bitbuffer_t *b
     SolarPanelCurrent  = convertByteToFloat(switchdoclabs_solarmax_payload, 41);
     AuxA  = convertByteToUnsignedLong(switchdoclabs_solarmax_payload, 45);
 
-
     // Format data
     for (int j = 0; j < msg_len; j++) {
         switchdoclabs_solarmax_data_payload[j] = (int)switchdoclabs_solarmax_payload[5 + j];

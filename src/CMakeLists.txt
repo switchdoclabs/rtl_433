@@ -154,6 +154,7 @@ add_executable(rtl_433
     devices/switchdoclabs_F016TH.c
     devices/switchdoclabs_solarmax.c
     devices/switchdoclabs_SM23.c
+    devices/switchdoclabs_weathersenseAQI.c
 )
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")

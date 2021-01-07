@@ -1,4 +1,4 @@
-/* SwitchDoc Labs SolarMAX Solar Power Controller
+/* SwitchDoc Labs WeatherSense Wireless AQI 
  * Uses:  RadioHead ASK (generic) protocol
  *
  * Default transmitter speed is 2000 bits per second, i.e. 500 us per bit.
@@ -14,8 +14,8 @@
 #define RH_ASK_HEADER_LEN 4
 #define RH_ASK_MAX_MESSAGE_LEN (RH_ASK_MAX_PAYLOAD_LEN - RH_ASK_HEADER_LEN - 3)
 
-uint8_t switchdoclabs_solarmax_payload[RH_ASK_MAX_PAYLOAD_LEN] = {0};
-int switchdoclabs_solarmax_data_payload[RH_ASK_MAX_MESSAGE_LEN];
+uint8_t switchdoclabs_weathersenseAQI_payload[RH_ASK_MAX_PAYLOAD_LEN] = {0};
+int switchdoclabs_weathersenseAQI_data_payload[RH_ASK_MAX_MESSAGE_LEN];
 
 // Note: all the "4to6 code" came from RadioHead source code.
 // see: http://www.airspayce.com/mikem/arduino/RadioHead/index.html
@@ -46,7 +46,7 @@ static uint8_t symbol_6to4(uint8_t symbol)
     return 0xFF; // Not found
 }
 
-static int switchdoclabs_solarmax_ask_extract(r_device *decoder, bitbuffer_t *bitbuffer, uint8_t row, /*OUT*/ uint8_t *payload)
+static int switchdoclabs_weathersenseAQI_ask_extract(r_device *decoder, bitbuffer_t *bitbuffer, uint8_t row, /*OUT*/ uint8_t *payload)
 {
     int len = bitbuffer->bits_per_row[row];
     int msg_len = RH_ASK_MAX_MESSAGE_LEN;
@@ -135,7 +135,7 @@ static int switchdoclabs_solarmax_ask_extract(r_device *decoder, bitbuffer_t *bi
     return msg_len;
 }
 
-long convertByteToLong(uint8_t buffer[], int index)
+long AQIconvertByteToLong(uint8_t buffer[], int index)
 {
 
     
@@ -160,7 +160,7 @@ long convertByteToLong(uint8_t buffer[], int index)
       return myData.word;
     }
 
-unsigned long convertByteToUnsignedLong(uint8_t buffer[], int index)
+unsigned long AQIconvertByteToUnsignedLong(uint8_t buffer[], int index)
 {
 
     
@@ -185,7 +185,28 @@ unsigned long convertByteToUnsignedLong(uint8_t buffer[], int index)
       return myData.word;
     }
 
-float convertByteToFloat(uint8_t buffer[], int index)
+unsigned int AQIconvertByteToUnsignedInt(uint8_t buffer[], int index)
+{
+
+    
+    union myInt {
+      struct{
+        uint8_t   byte1;
+        uint8_t   byte2;
+
+      };
+      unsigned int  word;
+    
+      };
+
+      union myInt myData;
+
+      myData.byte1 = buffer[index];
+      myData.byte2 = buffer[index+1];
+      return myData.word;
+    }
+
+float AQIconvertByteToFloat(uint8_t buffer[], int index)
 {
 
     
@@ -211,7 +232,52 @@ float convertByteToFloat(uint8_t buffer[], int index)
       return myData.word;
     }
 
-static int switchdoclabs_solarmax_ask_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+
+// AQI Calculation
+
+#define AMOUNT_OF_LEVELS  6
+
+int get_grid_index_(uint16_t value, int array[AMOUNT_OF_LEVELS][2]) {
+    for (int i = 0; i < AMOUNT_OF_LEVELS; i++) {
+      if (value >= array[i][0] && value <= array[i][1]) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+    int index_grid_[AMOUNT_OF_LEVELS][2] = {{0, 51}, {51, 100}, {101, 150}, {151, 200}, {201, 300}, {301, 500}};
+
+    int pm2_5_calculation_grid_[AMOUNT_OF_LEVELS][2] = {{0, 12}, {13, 35}, {36, 55}, {56, 150}, {151, 250}, {251, 500}};
+
+    int pm10_0_calculation_grid_[AMOUNT_OF_LEVELS][2] = {{0, 54},    {55, 154},  {155, 254},
+                                                       {255, 354}, {355, 424}, {425, 604}};
+
+int calculate_index_(uint16_t value, int array[AMOUNT_OF_LEVELS][2]) {
+    int grid_index = get_grid_index_(value, array);
+    int aqi_lo = index_grid_[grid_index][0];
+    int aqi_hi = index_grid_[grid_index][1];
+    int conc_lo = array[grid_index][0];
+    int conc_hi = array[grid_index][1];
+
+    return ((aqi_hi - aqi_lo) / (conc_hi - conc_lo)) * (value - conc_lo) + aqi_lo;
+
+    }
+
+
+unsigned int get_aqi(unsigned int pm2_5_value,unsigned int pm10_0_value)
+{
+    // from esphome
+
+    int pm2_5_index = calculate_index_(pm2_5_value, pm2_5_calculation_grid_);
+    int pm10_0_index = calculate_index_(pm10_0_value, pm10_0_calculation_grid_);
+
+    return (pm2_5_index < pm10_0_index) ? pm10_0_index : pm2_5_index;
+
+}
+
+
+static int switchdoclabs_weathersenseAQI_ask_callback(r_device *decoder, bitbuffer_t *bitbuffer)
 {
     data_t *data;
     uint8_t row = 0; // we are considering only first row
@@ -220,12 +286,18 @@ static int switchdoclabs_solarmax_ask_callback(r_device *decoder, bitbuffer_t *b
 // protocol data
     long messageID;
     uint8_t SolarMAXID;
-    uint8_t SolarMAXProtocol;
-    uint8_t SolarMAXSoftwareVersion;
+    uint8_t ProtocolVersion;
+    uint8_t SoftwareVersion;
     uint8_t WeatherSenseProtocol;
 
-    float InsideTemperature;
-    float InsideHumidity;
+    unsigned int PM1_0S;
+    unsigned int PM2_5S;
+    unsigned int PM10S;
+    unsigned int PM1_0A;
+    unsigned int PM2_5A;
+    unsigned int PM10A;
+    unsigned int EPAAQI; 
+
     float BatteryVoltage;
     float BatteryCurrent;
     float LoadVoltage;
@@ -237,63 +309,78 @@ static int switchdoclabs_solarmax_ask_callback(r_device *decoder, bitbuffer_t *b
 
 
 
-    msg_len = switchdoclabs_solarmax_ask_extract(decoder, bitbuffer, row, switchdoclabs_solarmax_payload);
+    msg_len = switchdoclabs_weathersenseAQI_ask_extract(decoder, bitbuffer, row, switchdoclabs_weathersenseAQI_payload);
     if (msg_len <= 0) {
         return msg_len; // pass error code on
     }
     data_len = msg_len - RH_ASK_HEADER_LEN - 3;
 
-    header_to = switchdoclabs_solarmax_payload[1];
-    header_from = switchdoclabs_solarmax_payload[2];
-    header_id = switchdoclabs_solarmax_payload[3];
-    header_flags = switchdoclabs_solarmax_payload[4];
+    header_to = switchdoclabs_weathersenseAQI_payload[1];
+    header_from = switchdoclabs_weathersenseAQI_payload[2];
+    header_id = switchdoclabs_weathersenseAQI_payload[3];
+    header_flags = switchdoclabs_weathersenseAQI_payload[4];
 
 
     // gather data
-    messageID = convertByteToLong(switchdoclabs_solarmax_payload, 5);
+    messageID = AQIconvertByteToLong(switchdoclabs_weathersenseAQI_payload, 5);
 
-    SolarMAXID = switchdoclabs_solarmax_payload[9];
-    WeatherSenseProtocol = switchdoclabs_solarmax_payload[10];
+    SolarMAXID = switchdoclabs_weathersenseAQI_payload[9];
+    WeatherSenseProtocol = switchdoclabs_weathersenseAQI_payload[10];
+    if (decoder->verbose > 1) {
+        fprintf(stderr, "%d: WeatherSenseProtocol\n", WeatherSenseProtocol);
+    }
 
-    if ((WeatherSenseProtocol != 8) && (WeatherSenseProtocol != 10) && (WeatherSenseProtocol != 11))
+    if (WeatherSenseProtocol != 15) 
     {
-        // only accept solarmax protocols
+        // only accept weathersenseAQI protocols
         return 0;
     }
 
-    SolarMAXProtocol = switchdoclabs_solarmax_payload[11];
-    SolarMAXSoftwareVersion = switchdoclabs_solarmax_payload[12];
+    ProtocolVersion = switchdoclabs_weathersenseAQI_payload[11];
 
-    LoadVoltage = convertByteToFloat(switchdoclabs_solarmax_payload, 13);
-    InsideTemperature = convertByteToFloat(switchdoclabs_solarmax_payload, 17);
-    InsideHumidity = convertByteToFloat(switchdoclabs_solarmax_payload, 21);
-    BatteryVoltage = convertByteToFloat(switchdoclabs_solarmax_payload, 25);
-    BatteryCurrent = convertByteToFloat(switchdoclabs_solarmax_payload, 29);
-    LoadCurrent  = convertByteToFloat(switchdoclabs_solarmax_payload, 33);
-    SolarPanelVoltage  = convertByteToFloat(switchdoclabs_solarmax_payload, 37);
-    SolarPanelCurrent  = convertByteToFloat(switchdoclabs_solarmax_payload, 41);
-    AuxA  = convertByteToUnsignedLong(switchdoclabs_solarmax_payload, 45);
+    PM1_0S = AQIconvertByteToUnsignedInt(switchdoclabs_weathersenseAQI_payload,12);
+    PM2_5S = AQIconvertByteToUnsignedInt(switchdoclabs_weathersenseAQI_payload,14);
+    PM10S = AQIconvertByteToUnsignedInt(switchdoclabs_weathersenseAQI_payload,16);
+    PM1_0A = AQIconvertByteToUnsignedInt(switchdoclabs_weathersenseAQI_payload,18);
+    PM2_5A = AQIconvertByteToUnsignedInt(switchdoclabs_weathersenseAQI_payload,20);
+    PM10A = AQIconvertByteToUnsignedInt(switchdoclabs_weathersenseAQI_payload,22);
 
+    LoadVoltage = AQIconvertByteToFloat(switchdoclabs_weathersenseAQI_payload, 24);
+    BatteryVoltage = AQIconvertByteToFloat(switchdoclabs_weathersenseAQI_payload, 28);
+    BatteryCurrent = AQIconvertByteToFloat(switchdoclabs_weathersenseAQI_payload, 32);
+    LoadCurrent  = AQIconvertByteToFloat(switchdoclabs_weathersenseAQI_payload, 36);
+    SolarPanelVoltage  = AQIconvertByteToFloat(switchdoclabs_weathersenseAQI_payload, 40);
+    SolarPanelCurrent  = AQIconvertByteToFloat(switchdoclabs_weathersenseAQI_payload, 44);
+    AuxA  = switchdoclabs_weathersenseAQI_payload[48] & 0x0F;
+    SoftwareVersion = (switchdoclabs_weathersenseAQI_payload[48] & 0xF0)>>4;
+    // Now calculate EPA AQI
+
+    EPAAQI = get_aqi(PM2_5S,PM10S);
 
     // Format data
     for (int j = 0; j < msg_len; j++) {
-        switchdoclabs_solarmax_data_payload[j] = (int)switchdoclabs_solarmax_payload[5 + j];
+        switchdoclabs_weathersenseAQI_data_payload[j] = (int)switchdoclabs_weathersenseAQI_payload[5 + j];
     }
 
 
     // now build output
     data = data_make(
-            "model",        "",             DATA_STRING, _X("SwitchDoc Labs SolarMAX","SwitchDoc Labs SolarMAX"),
+            "model",        "",             DATA_STRING, _X("SwitchDoc Labs WeatherSense Wireless AQI","SwitchDoc Labs AQI"),
             "len",          "Data len",     DATA_INT, data_len,
 
-            "messageid",        "Messager ID",        DATA_INT, messageID,
-            "deviceid",        "SolarMAX ID",        DATA_INT, SolarMAXID,
-            "protocolversion",        "SolarMAX Protocol Version",   DATA_INT, SolarMAXProtocol,
-            "softwareversion",        "SolarMAX Software Version",        DATA_INT, SolarMAXSoftwareVersion,
+            "messageid",        "Message ID",        DATA_INT, messageID,
+            "deviceid",        "Device ID",        DATA_INT, SolarMAXID,
+            "protocolversion",        "Protocol Version",   DATA_INT, ProtocolVersion,
+            "softwareversion",        "Software Version",        DATA_INT, SoftwareVersion,
             "weathersenseprotocol",        "WeatherSense Type",        DATA_INT, WeatherSenseProtocol,
+            "PM1.0S",        "PM1.0 Standard(ug/m)",        DATA_INT, PM1_0S,
+            "PM2.5S",        "PM2.5 Standard(ug/m)",        DATA_INT, PM2_5S,
+            "PM10S",        "PM10 Standard(ug/m)",        DATA_INT, PM10S,
+            "PM1.0A",        "PM1.0 Atmospheric(ug/m)",        DATA_INT, PM1_0A,
+            "PM2.5A",        "PM2.5 Atmospheric(ug/m)",        DATA_INT, PM2_5A,
+            "PM10A",        "PM10 Atmospheric(ug/m)",        DATA_INT, PM10A,
+            "AQI",        "AQI EPA",        DATA_INT, EPAAQI,
             "loadvoltage",        "Load Voltage",        DATA_DOUBLE, LoadVoltage,
-            "internaltemperature",        "Internal Temperature",        DATA_DOUBLE, InsideTemperature,
-            "internalhumidity",        "Internal Humidity",        DATA_DOUBLE, InsideHumidity,
             "batteryvoltage",        "Battery Voltage",        DATA_DOUBLE, BatteryVoltage,
             "batterycurrent",        "Battery Current",        DATA_DOUBLE, BatteryCurrent,
             "loadcurrent",        "Load Current",        DATA_DOUBLE, LoadCurrent,
@@ -310,15 +397,15 @@ static int switchdoclabs_solarmax_ask_callback(r_device *decoder, bitbuffer_t *b
 }
 
 
-static char *switchdoclabs_solarmax_ask_output_fields[] = {
+static char *switchdoclabs_weathersenseAQI_ask_output_fields[] = {
     "model",
     "len",
     "sparebyte",
     "messageid",
-    "solarmaxid",
-    "solarmaxprotocol",
-    "solarmaxsoftwareversion",
-    "solarmaxtype",
+    "weathersenseAQIid",
+    "weathersenseAQIprotocol",
+    "weathersenseAQIsoftwareversion",
+    "weathersenseAQItype",
     "loadvoltage",
     "insidetemperature",
     "insidehumidity",
@@ -333,13 +420,13 @@ static char *switchdoclabs_solarmax_ask_output_fields[] = {
 };
 
 
-r_device switchdoclabs_solarmax = {
-    .name           = "SwitchDoc Labs SolarMAX",
+r_device switchdoclabs_weathersenseAQI = {
+    .name           = "SwitchDoc Labs WeatherSenseAQI",
     .modulation     = OOK_PULSE_PCM_RZ,
     .short_width    = 500,
     .long_width     = 500,
     .reset_limit    = 5*500,
-    .decode_fn      = &switchdoclabs_solarmax_ask_callback,
-    .fields         = switchdoclabs_solarmax_ask_output_fields,
+    .decode_fn      = &switchdoclabs_weathersenseAQI_ask_callback,
+    .fields         = switchdoclabs_weathersenseAQI_ask_output_fields,
 };
 

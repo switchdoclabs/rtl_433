@@ -306,8 +306,11 @@ static int switchdoclabs_weathersenseAQI_ask_callback(r_device *decoder, bitbuff
     float SolarPanelCurrent;
     unsigned long AuxA;
     float AuxB;
+    float InternalTemperature;
+    float InternalHumidity;
 
-
+    InternalTemperature = 0.0;
+    InternalHumidity = 0.0;
 
     msg_len = switchdoclabs_weathersenseAQI_ask_extract(decoder, bitbuffer, row, switchdoclabs_weathersenseAQI_payload);
     if (msg_len <= 0) {
@@ -380,6 +383,8 @@ static int switchdoclabs_weathersenseAQI_ask_callback(r_device *decoder, bitbuff
             "PM2.5A",        "PM2.5 Atmospheric(ug/m)",        DATA_INT, PM2_5A,
             "PM10A",        "PM10 Atmospheric(ug/m)",        DATA_INT, PM10A,
             "AQI",        "AQI EPA",        DATA_INT, EPAAQI,
+            "internaltemperature",        "Internal Temperature",        DATA_DOUBLE, InternalTemperature,
+            "internalhumidity",        "Internal Humidity",        DATA_DOUBLE, InternalHumidity,
             "loadvoltage",        "Load Voltage",        DATA_DOUBLE, LoadVoltage,
             "batteryvoltage",        "Battery Voltage",        DATA_DOUBLE, BatteryVoltage,
             "batterycurrent",        "Battery Current",        DATA_DOUBLE, BatteryCurrent,

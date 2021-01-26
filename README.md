@@ -2,14 +2,17 @@
 
 # to compile on Raspberry Pi
 
+
 sudo apt-get install libtool libusb-1.0-0-dev librtlsdr-dev rtl-sdr build-essential autoconf cmake pkg-config
 
-cd rtl_433/
-mkdir build
-cd build
-cmake ..
-make
-sudo make install
+
+cd rtl_433/<BR>
+mkdir build<BR>
+cd build<BR>
+cmake ..<BR>
+make<BR>
+sudo make install<BR>
+.
 
 
 

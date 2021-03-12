@@ -10,6 +10,7 @@ cd rtl_433/<BR>
 mkdir build<BR>
 cd build<BR>
 cmake ..<BR>
+make clean <BR>
 make<BR>
 sudo make install<BR>
 .

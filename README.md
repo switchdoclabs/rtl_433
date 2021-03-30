@@ -1,4 +1,5 @@
 # rtl_433 with support for SwitchDoc Labs Wireless WeatherRack2 and FT003H Inside T/H sensors, SolarMAX and SM23 Soil Moisture Sensors
+# added AfterShock, AirQuality and Lightning Detectors
 
 # to compile on Raspberry Pi
 

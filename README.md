@@ -8,6 +8,9 @@ sudo apt-get install libtool libusb-1.0-0-dev librtlsdr-dev rtl-sdr build-essent
 
 
 cd rtl_433/<BR>
+	Or<BR>
+	cd SDR/rtl_433 (if you have the SDL SD Card) <BR>
+	
 mkdir build<BR>
 cd build<BR>
 cmake ..<BR>

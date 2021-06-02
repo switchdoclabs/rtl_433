@@ -17,6 +17,7 @@
 // Sensors ID
 #define ID_THGR122N 0x1d20
 #define ID_THGR968  0x1d30
+#define ID_BHTR918  0x5d50
 #define ID_BHTR968  0x5d60
 #define ID_RGR968   0x2d10
 #define ID_THR228N  0xec40
@@ -271,6 +272,37 @@ static int oregon_scientific_v2_1_decode(r_device *decoder, bitbuffer_t *bitbuff
                 NULL);
         decoder_output_data(decoder, data);
         return 1;
+    }
+    else if (sensor_id == ID_BHTR918) {
+           fprintf(stderr,"*******************Found sensor_id (%08x)\n",sensor_id);
+      if (validate_os_v2_message(decoder, msg, 84, msg_bits, 19) != 0)
+            return 0;
+        unsigned int comfort = msg[7] >> 4;
+        char *comfort_str = "Normal";
+        if (comfort == 4) comfort_str = "Comfortable";
+        else if (comfort == 8) comfort_str = "Dry";
+        else if (comfort == 0xc) comfort_str = "Humid";
+        unsigned int forecast = msg[9] >> 4;
+        char *forecast_str = "Cloudy";
+        if (forecast == 3) forecast_str = "Rainy";
+        else if (forecast == 6) forecast_str = "Partly Cloudy";
+        else if (forecast == 0xc) forecast_str = "Sunny";
+        float temp_c = get_os_temperature(msg);
+        float pressure = ((msg[7] & 0x0f) | (msg[8] & 0xf0)) + 856;
+        fprintf(stderr,"Weather Sensor BHTR918    Indoor        Temp: %3.1fC    %3.1fF     Humidity: %d%%", temp_c, ((temp_c*9)/5)+32, get_os_humidity(msg));
+        fprintf(stderr, " (%s) Pressure: %dmbar (%s)\n", comfort_str, ((msg[7] & 0x0f) | (msg[8] & 0xf0))+856, forecast_str);
+         data = data_make(
+                "brand",            "",                             DATA_STRING, "OS",
+                "model",            "",                             DATA_STRING, _X("Oregon-BHTR918","BHTR918"),
+                "id",                 "House Code",         DATA_INT,        get_os_rollingcode(msg),
+                "channel",        "Channel",                DATA_INT,        get_os_channel(msg, sensor_id),
+                "battery",        "Battery",                DATA_STRING, get_os_battery(msg) ? "LOW" : "OK",
+                "temperature_C",    "Celsius",        DATA_FORMAT, "%.02f C", DATA_DOUBLE, temp_c,
+                "humidity",     "Humidity",             DATA_FORMAT, "%u %%",     DATA_INT,        get_os_humidity(msg),
+                "pressure_hPa",    "Pressure",        DATA_FORMAT, "%.0f hPa",     DATA_DOUBLE, pressure,
+                NULL);
+        decoder_output_data(decoder, data);
+        return 1; 
     }
     else if (sensor_id == ID_BHTR968) {
         if (validate_os_v2_message(decoder, msg, 92, msg_bits, 19) != 0)

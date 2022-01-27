@@ -1,6 +1,7 @@
 # rtl_433 with support for SwitchDoc Labs Wireless WeatherRack2 and FT003H Inside T/H sensors, SolarMAX and SM23 Soil Moisture Sensors
 # added AfterShock, AirQuality and Lightning Detectors
 
+# update on 1/26/2022 - Fix to Serial number of FT020T AIO
 # to compile on Raspberry Pi
 
 

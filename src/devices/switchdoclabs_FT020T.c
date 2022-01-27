@@ -61,13 +61,13 @@ switchdoclabs_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned
    	b[i] = 0; 
 
     bitbuffer_extract_bytes(bitbuffer, row, bitpos, b, 16*8);
-    /*
+   /* 
     for (i=0; i< 16; i++)
     {
 	    fprintf(stderr,"%02x ", b[i]);
     }
     fprintf(stderr,"\n");
-    */
+   */ 
     uint8_t  myDevice;
     uint8_t  mySerial;
     uint8_t  myFlags;
@@ -95,15 +95,13 @@ switchdoclabs_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned
 		b2[i] = b2[i+1]; // shift 8
 
 	}
-
-	/*
+/*
     	for (i=0; i< 16; i++)
     	{
 	    	fprintf(stderr,"%02x ", b2[i]);
     	}
     	fprintf(stderr,"\n");
-	*/
-
+*/
     uint8_t expected = b2[13];
 		
     myCalculated = GetCRC(0xc0, b2, 13);
@@ -125,7 +123,7 @@ switchdoclabs_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned
 	{
 		return 0; // not my device
 	}
-   	mySerial = (b2[0]&0x0f)<<4 & (b2[1] % 0xf0)>>4;
+   	mySerial = (b2[0]&0x0f)<<4 | (b2[1])>>4;
    	myFlags  = b2[1] & 0x0f;
 	myBatteryLow = (myFlags & 0x08) >> 3;
    	myAveWindSpeed = b2[2] | ((myFlags & 0x01)<<8);

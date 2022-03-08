@@ -131,7 +131,8 @@ switchdoclabs_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned
    	myWindDirection= b2[4] | ((myFlags & 0x04)<<6);
    	myCumulativeRain=(b2[5]<<8) + b2[6]; 
    	mySecondFlags  = (b2[7] & 0xf0)>>4;
-	myTemperature = ((b2[7] & 0x0f)<<8) + b2[8];  
+	myTemperature = ((b2[7] & 0x0f)<<8) + b2[8];
+	float temperature = (myTemperature - 400) / 10.0f;
 	myHumidity = b2[9];
 	myLight = (b2[10]<<8) + b2[11] + ((mySecondFlags & 0x08)<<9);
 	myUV = b2[12]; 
@@ -190,12 +191,12 @@ switchdoclabs_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned
             "model",          "",             DATA_STRING, _X("SwitchDoc Labs-FT020T","SwitchDoc Labs FT020T AIO"),
             _X("id","device"),         "Device",   DATA_INT,    myDevice,
             "id",        "Serial Number",      DATA_INT,    mySerial,
-            "batterylow",        "Battery Low",      DATA_INT, myBatteryLow,
+            "battery",        "Battery",      DATA_STRING, myBatteryLow ? "Low" : "OK",
             "avewindspeed",        "Ave Wind Speed",      DATA_INT, myAveWindSpeed,
             "gustwindspeed",        "Gust",      DATA_INT, myGust,
             "winddirection",        "Wind Direction",      DATA_INT, myWindDirection,
             "cumulativerain",        "Cum Rain",      DATA_INT, myCumulativeRain,
-            "temperature",        "Temperature",      DATA_INT, myTemperature,
+            "temperature_F",  "Temperature",  DATA_FORMAT, "%.1f F", DATA_DOUBLE, temperature,
             "humidity",        "Humidity",      DATA_INT, myHumidity,
             "light",        "Light",      DATA_INT, myLight,
             "uv",        "UV Index",      DATA_INT, myUV,
@@ -242,12 +243,12 @@ static char *output_fields[] = {
     "model",
     "device", 
     "id",
-    "batterylow",
+    "battery",
     "avewindspeed",
     "gustwindspeed",
     "winddirection",
     "cumulativerain",
-    "temperature",
+    "temperature_F",
     "humidity",
     "light",
     "uv",

@@ -160,6 +160,7 @@
     DECL(switchdoclabs_weathersenseAQI) \
     DECL(switchdoclabs_weathersenseTB) \
     DECL(switchdoclabs_weathersenseAS) \
+    DECL(switchdoclabs_weathersenseRad) \
 
     /* Add new decoders here. */
 

@@ -4,6 +4,7 @@
 # update on 1/26/2022 - Fix to Serial number of FT020T AIO
 # to compile on Raspberry Pi
 
+#update on 3/27/2022 - Added WS Radiation Device and also fixed Light on WeatherRack2
 
 sudo apt-get install libtool libusb-1.0-0-dev librtlsdr-dev rtl-sdr build-essential autoconf cmake pkg-config
 

@@ -131,9 +131,12 @@ switchdoclabs_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned
    	myWindDirection= b2[4] | ((myFlags & 0x04)<<6);
    	myCumulativeRain=(b2[5]<<8) + b2[6]; 
    	mySecondFlags  = (b2[7] & 0xf0)>>4;
+  	//fprintf(stderr,"mySecondFlags = %01x %d\n", mySecondFlags, mySecondFlags );
+  	//fprintf(stderr,"mySecondFlags LB = %x %d\n", ((mySecondFlags & 0x08) <<13), ((mySecondFlags & 0x08) << 13) );
 	myTemperature = ((b2[7] & 0x0f)<<8) + b2[8];  
 	myHumidity = b2[9];
-	myLight = (b2[10]<<8) + b2[11] + ((mySecondFlags & 0x08)<<9);
+	myLight = (b2[10]<<8) + b2[11] + ((mySecondFlags & 0x08)<<13);
+  	//fprintf(stderr,"myLight = %04x %d\n", myLight, myLight );
 	myUV = b2[12]; 
 	//myUV = myUV + 10;
 	myCRC = b2[13];

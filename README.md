@@ -1,10 +1,12 @@
 # rtl_433 with support for SwitchDoc Labs Wireless WeatherRack2 and FT003H Inside T/H sensors, SolarMAX and SM23 Soil Moisture Sensors
 # added AfterShock, AirQuality and Lightning Detectors
 
-# update on 1/26/2022 - Fix to Serial number of FT020T AIO
 # to compile on Raspberry Pi
 
-#update on 3/27/2022 - Added WS Radiation Device and also fixed Light on WeatherRack2
+
+#1.3V update on 4/1/2022 - Additional fix on light reading
+#1.2V update on 3/27/2022 - Added WS Radiation Device and also fixed Light on WeatherRack2
+#1.1V update on 1/26/2022 - Fix to Serial number of FT020T AIO
 
 sudo apt-get install libtool libusb-1.0-0-dev librtlsdr-dev rtl-sdr build-essential autoconf cmake pkg-config
 

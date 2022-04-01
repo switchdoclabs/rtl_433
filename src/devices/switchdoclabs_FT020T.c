@@ -136,6 +136,7 @@ switchdoclabs_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned
 	myTemperature = ((b2[7] & 0x0f)<<8) + b2[8];  
 	myHumidity = b2[9];
 	myLight = (b2[10]<<8) + b2[11] + ((mySecondFlags & 0x08)<<13);
+    myLight = 0x1FFFF & myLight;
   	//fprintf(stderr,"myLight = %04x %d\n", myLight, myLight );
 	myUV = b2[12]; 
 	//myUV = myUV + 10;

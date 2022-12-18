@@ -158,6 +158,8 @@ add_executable(rtl_433
     devices/switchdoclabs_weathersenseTB.c
     devices/switchdoclabs_weathersenseAS.c
     devices/switchdoclabs_weathersenseRad.c
+    devices/switchdoclabs_weathersenseWR3.c
+    devices/switchdoclabs_weathersenseWR3PW.c
 )
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")

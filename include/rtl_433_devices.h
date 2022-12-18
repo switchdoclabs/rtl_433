@@ -161,6 +161,8 @@
     DECL(switchdoclabs_weathersenseTB) \
     DECL(switchdoclabs_weathersenseAS) \
     DECL(switchdoclabs_weathersenseRad) \
+    DECL(switchdoclabs_weathersenseWR3) \
+    DECL(switchdoclabs_weathersenseWR3PW) \
 
     /* Add new decoders here. */
 

@@ -1,9 +1,12 @@
-# rtl_433 with support for SwitchDoc Labs Wireless WeatherRack2 and FT003H Inside T/H sensors, SolarMAX and SM23 Soil Moisture Sensors
-# added AfterShock, AirQuality and Lightning Detectors
+# rtl_433 with support for SwitchDoc Labs Wireless WeatherRack2, WeatherRack3 and FT003H Inside T/H sensors, SolarMAX and SM23 Soil Moisture Sensors
+# added AfterShock, AirQuality, Lightning Detectors and WeatherRack3
 
 # to compile on Raspberry Pi
 
 
+#1.6V update on 12/18/2022 - Completion of WeatherRack3 (154) and WeatherRack3 Power (155) for Renogy
+#1.5V update on 11/26/2022 - Addition of WeatherRack3 and WeatherRack3 Power
+#1.4V update on 4/13/2022 - Additional fix on light reading
 #1.3V update on 4/1/2022 - Additional fix on light reading
 #1.2V update on 3/27/2022 - Added WS Radiation Device and also fixed Light on WeatherRack2
 #1.1V update on 1/26/2022 - Fix to Serial number of FT020T AIO

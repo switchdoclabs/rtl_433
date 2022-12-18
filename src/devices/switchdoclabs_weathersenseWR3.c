@@ -254,7 +254,8 @@ static int switchdoclabs_weathersenseWR3_ask_callback(r_device *decoder, bitbuff
     uint16_t Windforce = 0;
     uint16_t Winddirectiondegrees = 0;
     uint16_t Humidity = 0;
-    uint16_t Temperature = 0;
+    uint16_t TCTemperature = 0;
+    int Temperature = 0;
     uint16_t Noise = 0;
     uint16_t PM2_5 = 0;
     uint16_t PM10 = 0;
@@ -306,7 +307,20 @@ static int switchdoclabs_weathersenseWR3_ask_callback(r_device *decoder, bitbuff
     Windforce = WR3convertByteToUnsignedInt(switchdoclabs_weathersenseWR3_payload,16);
     Winddirectiondegrees = WR3convertByteToUnsignedInt(switchdoclabs_weathersenseWR3_payload,18);
     Humidity = WR3convertByteToUnsignedInt(switchdoclabs_weathersenseWR3_payload,20);
-    Temperature = WR3convertByteToUnsignedInt(switchdoclabs_weathersenseWR3_payload,22);
+    TCTemperature = WR3convertByteToUnsignedInt(switchdoclabs_weathersenseWR3_payload,22);
+    // Now convert TCTemperature to signed integer
+    if ((TCTemperature & 0X7FFF) > 0)
+    {
+        // negative Number
+        TCTemperature = ~TCTemperature & (0xFFFF);
+        TCTemperature ++;
+        Temperature = - TCTemperature;
+    }
+    else
+    {
+        Temperature = TCTemperature;
+    }
+
     Noise = WR3convertByteToUnsignedInt(switchdoclabs_weathersenseWR3_payload,24);
     PM2_5 = WR3convertByteToUnsignedInt(switchdoclabs_weathersenseWR3_payload,26);
     PM10 = WR3convertByteToUnsignedInt(switchdoclabs_weathersenseWR3_payload,28);

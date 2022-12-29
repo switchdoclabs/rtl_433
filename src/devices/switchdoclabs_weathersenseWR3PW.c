@@ -384,7 +384,7 @@ static int switchdoclabs_weathersenseWR3PW_ask_callback(r_device *decoder, bitbu
             "Max_Charge_Current_Today_Amps",        "Maximum Charge Current Today",        DATA_DOUBLE, Max_Charge_Current_Today_Amps,
             "Max_Discharge_Current_Today_Amps",        "Maximum Discharge Current Today",        DATA_DOUBLE, Max_Discharge_Current_Today_Amps,
             "Charge_Amp_Hrs_Today_Amp_Hours",        "Charge AmpHours Today ",        DATA_DOUBLE, Charge_Amp_Hrs_Today_Amp_Hours,
-            "Discharge_Amp_Hrs_Today_Amp_Hours ",        "Charge AmpHours Today ",        DATA_DOUBLE, Discharge_Amp_Hrs_Today_Amp_Hours ,
+            "Discharge_Amp_Hrs_Today_Amp_Hours",        "Charge AmpHours Today ",        DATA_DOUBLE, Discharge_Amp_Hrs_Today_Amp_Hours ,
             "Charge_Watt_Hrs_Today_Watt_Hours",        "Charge Watt Hours Today ",        DATA_DOUBLE, Charge_Watt_Hrs_Today_Watt_Hours,
             "Discharge_Watt_Hrs_Today_Watt_Hours",        "Discharge Watt Hours Today ",        DATA_DOUBLE, Discharge_Watt_Hrs_Today_Watt_Hours,
             "Controller_Uptime_Days",        "Total Uptime Days",        DATA_INT, Controller_Uptime_Days,

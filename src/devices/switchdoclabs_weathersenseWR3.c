@@ -16,7 +16,7 @@
 #define RH_ASK_MAX_MESSAGE_LEN (RH_ASK_MAX_PAYLOAD_LEN - RH_ASK_HEADER_LEN - 3)
 
 uint8_t switchdoclabs_weathersenseWR3_payload[RH_ASK_MAX_PAYLOAD_LEN] = {0};
-int switchdoclabs_weathersenseRad_data_payload[RH_ASK_MAX_MESSAGE_LEN];
+int switchdoclabs_weathersenseWR3_data_payload[RH_ASK_MAX_MESSAGE_LEN];
 
 // Note: all the "4to6 code" came from RadioHead source code.
 // see: http://www.airspayce.com/mikem/arduino/RadioHead/index.html
@@ -335,7 +335,7 @@ static int switchdoclabs_weathersenseWR3_ask_callback(r_device *decoder, bitbuff
     
     // Format data
     for (int j = 0; j < msg_len; j++) {
-        switchdoclabs_weathersenseRad_data_payload[j] = (int)switchdoclabs_weathersenseWR3_payload[5 + j];
+        switchdoclabs_weathersenseWR3_data_payload[j] = (int)switchdoclabs_weathersenseWR3_payload[5 + j];
     }
 
 
